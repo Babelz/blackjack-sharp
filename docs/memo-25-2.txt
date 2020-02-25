@@ -1,0 +1,26 @@
+1) ask for players
+2) ask for player names
+3) game begins
+
+1) place bets
+2) deal first cards
+3) deal seconds hards, hide second dealer card
+4) ask for player action
+	- bust
+	- blackjack
+	- hit
+	- double
+		- when initial two card value is 9, 10 or 11
+	- stand
+	- split
+		- if two same cards (ie two jacks, two sixes)
+		- same amount of bet on both hands
+5) deal dealer cards
+6) show status to players
+7) payout
+
+-- rules --
+	- 1-6 decks, 52 cards each
+	- ace is 1 or 11
+	- face cards are 10
+	- other cards are their values
