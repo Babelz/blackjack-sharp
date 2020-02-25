@@ -15,11 +15,6 @@ namespace Blackjack_Sharp
         /// Static random for shuffling decks.
         /// </summary>
         private static readonly Random random = new Random();
-
-        /// <summary>
-        /// Object for synchronizing access to <see cref="random"/>.
-        /// </summary>
-        private static readonly object randomLock = new object();
         #endregion
 
         #region Fields
@@ -30,7 +25,12 @@ namespace Blackjack_Sharp
         public bool Empty => cards.Count == 0;
         #endregion
 
-        private CardDeck(bool shuffle)
+        /// <summary>
+        /// Creates new instance of <see cref="CardDeck"/> and optionally
+        /// shuffles it immediately.
+        /// </summary>
+        /// <param name="shuffle">boolean declaring whether the deck should be shuffled immediately</param>
+        public CardDeck(bool shuffle = true)
         {
             // First, create cards in order.
             cards = new List<Card>();
@@ -41,18 +41,22 @@ namespace Blackjack_Sharp
                     cards.Add(new Card(face, suit));
             }
             
-            if (!shuffle) return;
+            if (shuffle) 
+                Shuffle();
+        }
 
+        /// <summary>
+        /// Shuffles the cards in the deck.
+        /// </summary>
+        public void Shuffle()
+        {
             // Shuffle deck using Fisher-Yates.
-            lock (randomLock)
+            for (var i = 0; i < cards.Count; i++)
             {
-                for (var i = 0; i < cards.Count; i++)
-                {
-                    var index = random.Next(0, cards.Count - 1);
+                var index = random.Next(0, cards.Count - 1);
 
-                    // Shuffle deck my swapping cards at indices.
-                    (cards[i], cards[index]) = (cards[index], cards[i]);
-                }
+                // Shuffle deck my swapping cards at indices.
+                (cards[i], cards[index]) = (cards[index], cards[i]);
             }
         }
 
@@ -75,21 +79,5 @@ namespace Blackjack_Sharp
         /// </summary>
         public void Return(Card card)
             => cards.Add(card ?? throw new ArgumentNullException(nameof(card)));
-
-        /// <summary>
-        /// Creates new instance of <see cref="CardDeck"/> where
-        /// all cards are shuffled.
-        /// </summary>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static CardDeck CreateShuffled()
-            => new CardDeck(true);
-
-        /// <summary>
-        /// Creates new instance of <see cref="CardDeck"/> where
-        /// all cards are order.
-        /// </summary>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static CardDeck CreateOrdered()
-            => new CardDeck(false);
     }
 }

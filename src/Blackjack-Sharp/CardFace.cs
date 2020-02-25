@@ -1,7 +1,8 @@
 ﻿namespace Blackjack_Sharp
 {
     /// <summary>
-    /// Enumeration that defines all faces for standard French playing cards.
+    /// Enumeration that defines all faces for standard French playing cards
+    /// found in 52-card deck.
     /// </summary>
     public enum CardFace : byte
     {
