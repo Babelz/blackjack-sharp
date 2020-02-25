@@ -61,8 +61,6 @@ namespace Blackjack_Sharp
         /// </summary>
         public Card Take()
         {
-            if (Empty) throw new InvalidOperationException("can't take card from empty deck");
-
             // Take top most card, give ownership to caller.
             var card = cards[0];
 
