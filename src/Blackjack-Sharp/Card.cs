@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Blackjack_Sharp
+﻿namespace Blackjack_Sharp
 {
     /// <summary>
     /// Class that represents a standard French playing card defined by it's

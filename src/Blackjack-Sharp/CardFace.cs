@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Blackjack_Sharp
+﻿namespace Blackjack_Sharp
 {
     /// <summary>
-    /// Enumeration that defines all faces for standard French playing cards and
-    /// their values defined by blackjack rules.
+    /// Enumeration that defines all faces for standard French playing cards.
     /// </summary>
     public enum CardFace : byte
     {

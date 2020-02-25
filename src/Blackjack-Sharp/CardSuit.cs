@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Blackjack_Sharp
+﻿namespace Blackjack_Sharp
 {
     /// <summary>
     /// Enumeration that defines all suits for standard French playing cards.
