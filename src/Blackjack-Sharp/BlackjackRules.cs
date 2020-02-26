@@ -10,10 +10,17 @@ namespace Blackjack_Sharp
     /// </summary>
     public static class BlackjackRules
     {
+        /// <summary>
+        /// Returns boolean declaring whether given cards allow
+        /// splitting.
+        /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool CanSplit(IEnumerable<Card> cards)
             => cards.Count() == 2 && cards.ElementAt(0).Face == cards.ElementAt(1).Face;
 
+        /// <summary>
+        /// Returns boolean declaring whether given cards allow doubling.
+        /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool CanDouble(IEnumerable<Card> cards)
         {
@@ -24,14 +31,23 @@ namespace Blackjack_Sharp
             return sum >= 9 && sum <= 11;
         }
 
+        /// <summary>
+        /// Returns boolean declaring whether value represents a bust.
+        /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool IsBusted(int value)
             => value > 21;
 
+        /// <summary>
+        /// Returns boolean declaring whether value represents a blackjack.
+        /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool IsBlackjack(IEnumerable<Card> cards)
-            => cards.Sum(c => (byte)c.Face) == 21;
+        public static bool IsBlackjack(int value )
+            => value == 21;
 
+        /// <summary>
+        /// Returns value and soft value of given card.
+        /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void ValueOf(Card card, out int value, out int soft)
         {
@@ -54,6 +70,9 @@ namespace Blackjack_Sharp
             }
         }
 
+        /// <summary>
+        /// Counts value and soft value of given cards.
+        /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void ValueOf(IEnumerable<Card> cards, out int value, out int soft)
         {

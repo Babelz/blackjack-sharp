@@ -41,5 +41,11 @@ namespace Blackjack_Sharp
 
             return second;
         }
+
+        /// <summary>
+        /// Clears the hand removing all cards from it.
+        /// </summary>
+        public void Clear()
+            => cards.Clear();
     }
 }
