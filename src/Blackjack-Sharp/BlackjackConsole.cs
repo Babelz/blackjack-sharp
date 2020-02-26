@@ -18,6 +18,13 @@ namespace Blackjack_Sharp
             this.dealerColor = dealerColor;
         }
 
+        public void WriteLine(string line)
+        {
+            Console.Write("");
+
+            Console.WriteLine($"{line}");
+        }
+
         /// <summary>
         /// Writes given line as dealer info to the console.
         /// </summary>

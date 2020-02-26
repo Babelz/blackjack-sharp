@@ -29,6 +29,11 @@
         /// <summary>
         /// Player is leaving the table.
         /// </summary>
-        Leave = 4
+        Leave = 4,
+
+        /// <summary>
+        /// Player is skipping current round.
+        /// </summary>
+        Skip = 5
     }
 }

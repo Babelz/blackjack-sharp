@@ -1,4 +1,6 @@
-﻿namespace Blackjack_Sharp
+﻿using System;
+
+namespace Blackjack_Sharp
 {
     /// <summary>
     /// Class that represents dealer in a card game.
@@ -51,11 +53,27 @@
             }
         }
 
-        public Card Take()
+        /// <summary>
+        /// Deals single card to given hand and returns the card to the caller,
+        /// always assumed to return a card.
+        /// </summary>
+        public Card Deal(Hand hand)
         {
+            // Repopulate the deck if it is empty.
             if (deck.Empty) PopulateDeck();
 
-            return deck.Take();
+            var card = deck.Take();
+
+            hand.Add(card);
+
+            return card;
         }
+
+        /// <summary>
+        /// Deals card to the dealer from dealers deck and returns
+        /// the card to the caller.
+        /// </summary>
+        public Card DealSelf()
+            => Deal(Hand);
     }
 }

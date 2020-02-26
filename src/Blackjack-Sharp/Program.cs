@@ -4,9 +4,9 @@
     {
         private static void Main(string[] args)
         {
-            var application = new BlackjackApplication();
+            var game = new BlackjackGame();
 
-            application.Run();
+            game.Run();
         }
     }
 }

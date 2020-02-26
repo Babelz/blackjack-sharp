@@ -35,7 +35,7 @@ namespace Blackjack_Sharp
             private set;
         }
 
-        public Wallet Balance
+        public Wallet Wallet
         {
             get;
         }
@@ -51,8 +51,8 @@ namespace Blackjack_Sharp
         public Player(string name, uint initialBalance)
         {
             Name        = !string.IsNullOrEmpty(name) ? name : throw new ArgumentNullException(nameof(name));
+            Wallet      = new Wallet(initialBalance);
             PrimaryHand = new Hand();
-            Balance     = new Wallet(initialBalance);
         }
 
         public void Clear()

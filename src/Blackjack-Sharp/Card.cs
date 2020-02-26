@@ -29,5 +29,20 @@
             Face = face;
             Suit = suit;
         }
+
+        public sealed override string ToString()
+        {
+            var prefix = char.ToUpper(Suit.ToString()[0]);
+            var suffix = (Face) switch
+            {
+                CardFace.Ace   => "ace",
+                CardFace.Jack  => "jack",
+                CardFace.Queen => "queen",
+                CardFace.King  => "king",
+                _              => ((byte)Face).ToString(),
+            };
+
+            return $"{prefix}-{suffix}";
+        }
     }
 }

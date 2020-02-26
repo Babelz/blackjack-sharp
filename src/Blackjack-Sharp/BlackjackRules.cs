@@ -30,19 +30,6 @@ namespace Blackjack_Sharp
             => cards.Count() == 2 && cards.ElementAt(0).Face == cards.ElementAt(1).Face;
 
         /// <summary>
-        /// Returns boolean declaring whether given cards allow doubling.
-        /// </summary>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool CanDouble(IEnumerable<Card> cards)
-        {
-            if (cards.Count() != 2) return false;
-
-            var sum = cards.Sum(c => (byte)c.Face);
-
-            return sum >= 9 && sum <= 11;
-        }
-
-        /// <summary>
         /// Returns boolean declaring whether value represents a bust.
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
