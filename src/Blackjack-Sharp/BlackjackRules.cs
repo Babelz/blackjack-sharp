@@ -11,6 +11,18 @@ namespace Blackjack_Sharp
     public static class BlackjackRules
     {
         /// <summary>
+        /// Returns boolean declaring whether it is considered a good move
+        /// to stay with the current deck.
+        /// </summary>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool ShouldStay(IEnumerable<Card> cards)
+        {
+            ValueOf(cards, out var value, out var soft);
+
+            return value >= 16 || soft >= 16;
+        }
+
+        /// <summary>
         /// Returns boolean declaring whether given cards allow
         /// splitting.
         /// </summary>

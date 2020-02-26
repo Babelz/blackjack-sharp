@@ -68,10 +68,14 @@ namespace Blackjack_Sharp
         }
 
         /// <summary>
-        /// Returns given card to the deck. Multiple cards with same suit and face
-        /// can exist in single deck.
+        /// Joins this deck with given deck removing all cards from
+        /// the other deck and placing them to this deck.
         /// </summary>
-        public void Return(Card card)
-            => cards.Add(card ?? throw new ArgumentNullException(nameof(card)));
+        public void Join(CardDeck other)
+        {
+            cards.AddRange(other.cards);
+
+            other.cards.Clear();
+        }
     }
 }

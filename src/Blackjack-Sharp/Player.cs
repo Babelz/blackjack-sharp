@@ -4,7 +4,7 @@
     /// Class that represents a blackjack player defined by the name
     /// of the player, hands and wallet.
     /// </summary>
-    public sealed class BlackjackPlayer
+    public sealed class Player
     {
         #region Properties
         public string Name
@@ -12,12 +12,12 @@
             get;
         }
 
-        public PlayerHand Primary
+        public Hand PrimaryHand
         {
             get;
         }
 
-        public PlayerHand Secondary
+        public Hand SecondaryHand
         {
             get;
             private set;
@@ -27,6 +27,20 @@
         {
             get;
         }
+
+        public bool IsSplit
+            => SecondaryHand != null;
         #endregion
+
+        public Player()
+        {
+        }
+
+        public void Clear()
+        {
+            PrimaryHand.Clear();
+
+            SecondaryHand = null;
+        }
     }
 }

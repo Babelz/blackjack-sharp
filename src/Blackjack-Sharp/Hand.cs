@@ -1,26 +1,19 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 
 namespace Blackjack_Sharp
 {
     /// <summary>
-    /// Class that represents players hand in standard blackjack.
+    /// Class that represents hand containing cards.
     /// </summary>
-    public sealed class PlayerHand
+    public sealed class Hand : IEnumerable<Card>
     {
         #region Fields
         private readonly List<Card> cards;
         #endregion
 
-        #region Properties
-        /// <summary>
-        /// Returns boolean declaring whether the hand can be split.
-        /// </summary>
-        public bool CanSplit
-            => cards.Count == 2 && cards[0].Face == cards[1].Face;
-        #endregion
-
-        public PlayerHand()
+        public Hand()
             => cards = new List<Card>();
 
         public void Add(Card card)
@@ -29,12 +22,13 @@ namespace Blackjack_Sharp
         /// <summary>
         /// Splits the current hand.
         /// </summary>
-        public PlayerHand Split()
+        public Hand Split()
         {
             // Create new hand and add the split card to it.
-            var second = new PlayerHand();
-
-            second.Add(cards[0]);
+            var second = new Hand
+            {
+                cards[0]
+            };
 
             // Remove split card from this hand.
             cards.RemoveAt(0);
@@ -47,5 +41,11 @@ namespace Blackjack_Sharp
         /// </summary>
         public void Clear()
             => cards.Clear();
+
+        public IEnumerator<Card> GetEnumerator()
+            => cards.GetEnumerator();
+
+        IEnumerator IEnumerable.GetEnumerator()
+            => cards.GetEnumerator();
     }
 }
