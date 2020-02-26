@@ -9,7 +9,7 @@
         /// <summary>
         /// How many additional decks are in play.
         /// </summary>
-        public const uint AdditionalDecksCount = 8;
+        public const uint AdditionalDecksCount = 7;
         #endregion
 
         #region Fields
@@ -37,10 +37,10 @@
         {
             this.additionalDecksCount = additionalDecksCount;
 
-            CreateDeck();
+            PopulateDeck();
         }
 
-        private void CreateDeck()
+        private void PopulateDeck()
         {
             // Create root deck, guarantee that there is always 
             // one deck in use.
@@ -60,7 +60,7 @@
 
         public Card Take()
         {
-            if (deck.Empty) CreateDeck();
+            if (deck.Empty) PopulateDeck();
 
             return deck.Take();
         }
