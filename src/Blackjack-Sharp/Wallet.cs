@@ -3,7 +3,7 @@
     /// <summary>
     /// Class that handles money related operations of players.
     /// </summary>
-    public sealed class PlayerWallet
+    public sealed class Wallet
     {
         #region Properties
         /// <summary>
@@ -22,7 +22,7 @@
             => Balance == 0;
         #endregion
 
-        public PlayerWallet(uint initialBalance)
+        public Wallet(uint initialBalance)
             => Balance = initialBalance;
         
         public void Put(uint amount)

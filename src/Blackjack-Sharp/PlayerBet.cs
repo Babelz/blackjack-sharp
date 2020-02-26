@@ -1,23 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Blackjack_Sharp
 {
     /// <summary>
-    /// Class that represents bet information of players single hand.
+    /// Class that represents bet information single hand.
     /// </summary>
     public sealed class PlayerBet
     {
         #region Properties
-        /// <summary>
-        /// Gets the player that owns this bet.
-        /// </summary>
-        public Player Player
-        {
-            get;
-        }
-
         /// <summary>
         /// Gets the hand this bet has been placed to.
         /// </summary>
@@ -35,9 +25,8 @@ namespace Blackjack_Sharp
         }
         #endregion
 
-        public PlayerBet(Player player, Hand hand, uint amount)
+        public PlayerBet(Hand hand, uint amount)
         {
-            Player = player ?? throw new ArgumentNullException(nameof(player));
             Hand   = hand ?? throw new ArgumentNullException(nameof(hand));
             Amount = amount;
         }

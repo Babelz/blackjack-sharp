@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
 
@@ -19,7 +18,7 @@ namespace Blackjack_Sharp
         {
             ValueOf(cards, out var value, out var soft);
 
-            return value >= 16 || soft >= 16;
+            return value >= 17 || soft >= 17;
         }
 
         /// <summary>

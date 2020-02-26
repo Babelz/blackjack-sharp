@@ -3,9 +3,9 @@
 namespace Blackjack_Sharp
 {
     /// <summary>
-    /// Class that provides console related blackjack operations.
+    /// Class that provides console for blackjack game.
     /// </summary>
-    public sealed class BlackjackConsole
+    public sealed class BlackjackConsole 
     {
         #region Fields
         private readonly ConsoleColor playerColor;
@@ -18,6 +18,9 @@ namespace Blackjack_Sharp
             this.dealerColor = dealerColor;
         }
 
+        /// <summary>
+        /// Writes given line as dealer info to the console.
+        /// </summary>
         public void WriteDealerInfo(string line)
         {
             Console.Write("dealer: ");
@@ -29,6 +32,9 @@ namespace Blackjack_Sharp
             Console.ForegroundColor = ConsoleColor.White;
         }
 
+        /// <summary>
+        /// Writes given line to a player to the console.
+        /// </summary>
         public void WritePlayerInfo(string name, string line)
         {
             Console.Write($"{name}: ");
@@ -40,6 +46,9 @@ namespace Blackjack_Sharp
             Console.ForegroundColor = ConsoleColor.White;
         }
 
+        /// <summary>
+        /// Writes given warning to the console.
+        /// </summary>
         public void WriteWarning(string line)
         {
             Console.Write("warning! ");
@@ -51,9 +60,16 @@ namespace Blackjack_Sharp
             Console.ForegroundColor = ConsoleColor.White;
         }
 
+        /// <summary>
+        /// Writes separator to the console.
+        /// </summary>
         public void WriteSeparator()
             => Console.WriteLine("----------------");
-    
+        
+        /// <summary>
+        /// Attempts to ask a line from the player. Returns boolean declaring 
+        /// whether line was entered.
+        /// </summary>
         public bool TryAskLine(string what, out string value)
         {
             Console.Write($"{what}: ");
@@ -63,6 +79,10 @@ namespace Blackjack_Sharp
             return string.IsNullOrEmpty(value);
         }
 
+        /// <summary>
+        /// Attempts to ask a signed integer from the player. Returns boolean declaring 
+        /// whether value was entered successfully.
+        /// </summary>
         public bool TryAskSigned(string what, out int value)
         {
             Console.Write($"{what}: ");
@@ -70,6 +90,10 @@ namespace Blackjack_Sharp
             return int.TryParse(Console.ReadLine(), out value);
         }
 
+        /// <summary>
+        /// Attempts to ask a unsigned integer from the player. Returns boolean declaring 
+        /// whether value was entered successfully
+        /// </summary>
         public bool TryAskUnsigned(string what, out uint value)
         {
             Console.Write($"{what}: ");

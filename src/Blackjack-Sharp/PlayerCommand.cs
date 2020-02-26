@@ -3,7 +3,7 @@
     /// <summary>
     /// Enumeration containing all blackjack related player operations.
     /// </summary>
-    public enum PlayerOperations : byte
+    public enum PlayerCommand : byte
     {
         /// <summary>
         /// Stay with current hand, no further operations are to be made.
@@ -24,6 +24,11 @@
         /// Splits the current hand and place same amount of bet to the newly
         /// created hand.
         /// </summary>
-        Split = 3
+        Split = 3,
+
+        /// <summary>
+        /// Player is leaving the table.
+        /// </summary>
+        Leave = 4
     }
 }

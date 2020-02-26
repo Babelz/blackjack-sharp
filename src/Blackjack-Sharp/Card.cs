@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-
-namespace Blackjack_Sharp
+﻿namespace Blackjack_Sharp
 {
     /// <summary>
     /// Class that represents a standard French playing card defined by it's

@@ -1,17 +1,10 @@
 ﻿namespace Blackjack_Sharp
 {
     /// <summary>
-    /// Class that represents dealer in blackjack.
+    /// Class that represents dealer in a card game.
     /// </summary>
-    public sealed class BlackjackDealer
+    public sealed class Dealer
     {
-        #region Constant fields
-        /// <summary>
-        /// How many additional decks are in play.
-        /// </summary>
-        public const uint AdditionalDecksCount = 7;
-        #endregion
-
         #region Fields
         private readonly uint additionalDecksCount;
         
@@ -29,11 +22,11 @@
         #endregion
 
         /// <summary>
-        /// Creates new instance of <see cref="BlackjackDealer"/> with given
+        /// Creates new instance of <see cref="Dealer"/> with given
         /// count of additional decks. Dealer is always guaranteed to have at least
         /// one deck in play.
         /// </summary>
-        public BlackjackDealer(uint additionalDecksCount = AdditionalDecksCount)
+        public Dealer(uint additionalDecksCount = 0)
         {
             this.additionalDecksCount = additionalDecksCount;
 

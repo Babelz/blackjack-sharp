@@ -1,10 +1,12 @@
-﻿
-namespace Blackjack_Sharp
+﻿namespace Blackjack_Sharp
 {
-    public class Program
+    public static class Program
     {
         private static void Main(string[] args)
         {
+            var application = new BlackjackApplication();
+
+            application.Run();
         }
     }
 }
