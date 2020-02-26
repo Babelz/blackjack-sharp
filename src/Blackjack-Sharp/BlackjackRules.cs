@@ -95,6 +95,7 @@ namespace Blackjack_Sharp
             {
                 ValueOf(card, out var cardValue, out var cardSoft);
 
+                // In case an ace busts the current hand.
                 if (card.Face == CardFace.Ace && IsBusted(cardSoft + soft))
                     cardSoft = 1;
 
