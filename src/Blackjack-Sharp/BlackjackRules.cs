@@ -18,7 +18,7 @@ namespace Blackjack_Sharp
         {
             ValueOf(cards, out var value, out var soft);
 
-            return value >= 17 || soft >= 17;
+            return value == 17 || soft == 17;
         }
 
         /// <summary>
