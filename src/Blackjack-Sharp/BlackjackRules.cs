@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Text;
 
 namespace Blackjack_Sharp
 {
@@ -26,43 +25,50 @@ namespace Blackjack_Sharp
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool IsBusted(int value)
+            => value > 21;
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool IsBlackjack(IEnumerable<Card> cards)
             => cards.Sum(c => (byte)c.Face) == 21;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void ValueOf(Card card, out int low, out int high)
+        public static void ValueOf(Card card, out int value, out int soft)
         {
             switch (card.Face)
             {
                 case CardFace.Ace:
-                    low  = 1;
-                    high = 11;
+                    value = 1;
+                    soft  = 11;
                     break;
                 case CardFace.Jack:
                 case CardFace.Queen:
                 case CardFace.King:
-                    low  = 10;
-                    high = low;
+                    value = 10;
+                    soft  = value;
                     break;
                 default:
-                    low  = (byte)card.Face;
-                    high = low;
+                    value = (byte)card.Face;
+                    soft  = value;
                     break;
             }
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void ValueOf(IEnumerable<Card> cards, out int low, out int high)
+        public static void ValueOf(IEnumerable<Card> cards, out int value, out int soft)
         {
-            low  = 0;
-            high = 0;
-            
+            value = 0;
+            soft  = 0;
+
             foreach (var card in cards)
             {
-                ValueOf(card, out var cardLow, out var cardHigh);
+                ValueOf(card, out var cardValue, out var cardSoft);
 
-                low  += cardLow;
-                high += cardHigh;
+                if (card.Face == CardFace.Ace && IsBusted(cardSoft + soft))
+                    cardSoft = 1;
+
+                value += cardValue;
+                soft  += cardSoft;
             }
         }
     }

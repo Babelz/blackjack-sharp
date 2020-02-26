@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.CompilerServices;
 
 namespace Blackjack_Sharp
 {
@@ -10,13 +9,6 @@ namespace Blackjack_Sharp
     /// </summary>
     public sealed class CardDeck 
     {
-        #region Static fields
-        /// <summary>
-        /// Static random for shuffling decks.
-        /// </summary>
-        private static readonly Random random = new Random();
-        #endregion
-
         #region Fields
         private readonly List<Card> cards;
         #endregion
@@ -51,6 +43,8 @@ namespace Blackjack_Sharp
         public void Shuffle()
         {
             // Shuffle deck using Fisher-Yates.
+            var random = new Random();
+
             for (var i = 0; i < cards.Count; i++)
             {
                 var index = random.Next(0, cards.Count - 1);
