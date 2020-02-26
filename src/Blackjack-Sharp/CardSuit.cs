@@ -5,9 +5,9 @@
     /// </summary>
     public enum CardSuit : byte
     {
-        Clubs = 0,
-        Diamonds,
-        Hearts,
-        Spades 
+        Clubs    = 0,
+        Diamonds = 1,
+        Hearts   = 2,
+        Spades   = 3 
     }
 }
