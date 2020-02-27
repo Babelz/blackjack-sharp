@@ -24,16 +24,6 @@
         /// Splits the current hand and place same amount of bet to the newly
         /// created hand.
         /// </summary>
-        Split = 3,
-
-        /// <summary>
-        /// Player is leaving the table.
-        /// </summary>
-        Leave = 4,
-
-        /// <summary>
-        /// Player is skipping current round.
-        /// </summary>
-        Skip = 5
+        Split = 3
     }
 }

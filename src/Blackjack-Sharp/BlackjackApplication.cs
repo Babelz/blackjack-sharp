@@ -10,7 +10,7 @@ namespace Blackjack_Sharp
     /// <summary>
     /// Class that provides epic CLI blackjack experience.
     /// </summary>
-    public sealed class BlackjackGame
+    public sealed class BlackjackApplication
     {
         #region Constant fields
         /// <summary>
@@ -20,12 +20,11 @@ namespace Blackjack_Sharp
         #endregion
 
         #region Fields
-        private readonly Dealer dealer;
-
         // Lookup that associates players with their bets.
         private readonly Dictionary<Player, List<PlayerBet>> bets;
 
-        private readonly BlackjackConsole console;
+        private readonly IBlackjackConsole console;
+        private readonly IDealer dealer;
 
         private readonly List<Player> playing;
         private readonly List<Player> active;
@@ -34,13 +33,11 @@ namespace Blackjack_Sharp
         private bool running;
         #endregion
 
-        public BlackjackGame()
+        public BlackjackApplication(IDealer dealer, IBlackjackConsole console)
         {
-            // Just initialize dependencies in the constructor, no need for
-            // DI as we can test this class with them...
-            dealer  = new Dealer(5);
-            console = new BlackjackConsole(ConsoleColor.Green, ConsoleColor.Cyan);
-
+            this.dealer  = dealer ?? throw new ArgumentNullException(nameof(dealer)); 
+            this.console = console ?? throw new ArgumentNullException(nameof(console));
+            
             playing = new List<Player>();
             active  = new List<Player>();
             absent  = new List<Player>();
@@ -86,7 +83,49 @@ namespace Blackjack_Sharp
 
         private void PlayersPlay()
         {
-            throw new NotImplementedException();
+            foreach (var player in playing)
+            {
+                console.WritePlayerInfo(player.Name, "it's my turn");
+
+                for (;;)
+                {
+                    var options = new List<string>()
+                    {
+                        PlayerCommand.Stay.ToString().ToLower(),
+                        PlayerCommand.Hit.ToString().ToLower(),
+                        PlayerCommand.Double.ToString().ToLower()
+                    };
+
+                    if (!player.IsSplit && BlackjackRules.CanSplit(player.PrimaryHand))
+                        options.Add(PlayerCommand.Split.ToString().ToLower());
+
+                    var optionsString = string.Join(',', options.SelectMany(s => s.ToString().ToLower()));
+                    var optionLine    = string.Empty;
+
+                    while (!console.TryAskLine($"what will you do ({optionsString})",
+                                               out optionLine, 
+                                               s => options.Contains(s)))
+                    {
+                        console.WriteWarning("invalid operation!");
+                    }
+
+                    var operation = (PlayerCommand)Enum.Parse(typeof(PlayerCommand), optionLine, true);
+
+                    switch (operation)
+                    {
+                        case PlayerCommand.Stay:
+                            break;
+                        case PlayerCommand.Hit:
+                            break;
+                        case PlayerCommand.Double:
+                            break;
+                        case PlayerCommand.Split:
+                            break;
+                        default:
+                            break;
+                    }
+                }
+            }
         }
 
         private void RevealPlayerCards()

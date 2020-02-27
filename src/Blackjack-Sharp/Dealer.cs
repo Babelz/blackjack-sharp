@@ -3,20 +3,17 @@
 namespace Blackjack_Sharp
 {
     /// <summary>
-    /// Class that represents dealer in a card game.
+    /// Default implementation of <see cref="IDealer"/>.
     /// </summary>
-    public sealed class Dealer
+    public sealed class Dealer : IDealer
     {
         #region Fields
         private readonly uint additionalDecksCount;
-        
+
         private CardDeck deck;
         #endregion
 
         #region Properties
-        /// <summary>
-        /// Gets the hand of the dealer.
-        /// </summary>
         public Hand Hand
         {
             get;
@@ -55,10 +52,6 @@ namespace Blackjack_Sharp
             }
         }
 
-        /// <summary>
-        /// Deals single card to given hand and returns the card to the caller,
-        /// always assumed to return a card.
-        /// </summary>
         public Card Deal(Hand hand)
         {
             // Repopulate the deck if it is empty.
@@ -71,10 +64,6 @@ namespace Blackjack_Sharp
             return card;
         }
 
-        /// <summary>
-        /// Deals card to the dealer from dealers deck and returns
-        /// the card to the caller.
-        /// </summary>
         public Card DealSelf()
             => Deal(Hand);
     }

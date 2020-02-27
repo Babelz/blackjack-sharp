@@ -1,12 +1,16 @@
-﻿namespace Blackjack_Sharp
+﻿using System;
+
+namespace Blackjack_Sharp
 {
     public static class Program
     {
         private static void Main(string[] args)
         {
-            var game = new BlackjackGame();
+            var application = new BlackjackApplication(
+                new Dealer(5), 
+                new BlackjackConsole(ConsoleColor.Green, ConsoleColor.Cyan));
 
-            game.Run();
+            application.Run();
         }
     }
 }
