@@ -14,7 +14,7 @@ namespace Blackjack_Sharp
     {
         #region Constant fields
         /// <summary>
-        /// Initial balance of all players in whole euros. 1000€
+        /// Initial balance of all players in whole euros. 1000e
         /// </summary>
         public const int InitialBalance = 1000;
         #endregion
@@ -60,7 +60,7 @@ namespace Blackjack_Sharp
             foreach (var player in absentPlayers)
             {
                 console.WriteLine($"{player}");
-                console.WriteLine($"balance: {player.Wallet.Balance}€\n");
+                console.WriteLine($"balance: {player.Wallet.Balance}e\n");
             }
 
             running = false;
@@ -78,7 +78,7 @@ namespace Blackjack_Sharp
 
         private void RevealDealersSecondCard()
         {
-            throw new NotImplementedException();
+            console.WriteDealerInfo($"my first card is {dealer.Hand.First().ToString()}");
         }
 
         private void PlayerPlayHand(Player player, Hand hand, int handIndex, int handsCount)
@@ -91,7 +91,7 @@ namespace Blackjack_Sharp
                 var option = string.Empty;
 
                 while (!console.TryAskLine($"playing your hand {handIndex + 1}/{handsCount}, what will you do? " +
-                                           $"({string.Join(",", opts)})",
+                                           $"({string.Join(", ", opts)})",
                                            out option,
                                            s => opts.Contains(s)))
                 {
@@ -101,11 +101,13 @@ namespace Blackjack_Sharp
                 switch (option)
                 {
                     case PlayerOptions.OptStay:
+                        // Nothing else to do, end turn.
                         console.WriteDealerInfo("staying, your turn is over");
 
                         playing = false;
                         break;
                     case PlayerOptions.OptHit:
+                        // Deal one card and reveal the hand to player.
                         console.WriteDealerInfo("dealing one card...");
 
                         dealer.Deal(hand);
@@ -114,12 +116,14 @@ namespace Blackjack_Sharp
 
                         if (BlackjackRules.IsBlackjack(hand))
                         {
+                            // Handle blackjack.
                             console.WriteDealerInfo("blackjack! your turn is over");
 
                             playing = false;
                         }
                         else if (BlackjackRules.IsBusted(hand))
                         {
+                            // Handle bust.
                             console.WriteDealerInfo("busted! sorry, your hand is out");
 
                             playing = false;
@@ -128,14 +132,20 @@ namespace Blackjack_Sharp
                     case PlayerOptions.OptDouble:
                         var bet = bets[player].First();
 
+                        // Do not allow doubling if the player has not enough balance.
                         if (player.Wallet.Balance < bet.Amount)
                             console.WriteDealerInfo("sorry, you do not have enough balance to double");
                         else
                         {
+                            // Do the actual doubling.
                             console.WriteDealerInfo("doubling your hand...");
 
                             player.Wallet.Take(bet.Amount);
 
+                            // Create new bet in place of the current one, we can 
+                            // always assume there is only one bet in play when
+                            // the player is doubling because casino does not allow
+                            // doubling split hands.
                             var newBet = new PlayerBet(hand, bet.Amount * 2u);
 
                             bets[player] = new List<PlayerBet>
@@ -143,7 +153,7 @@ namespace Blackjack_Sharp
                                 newBet
                             };
 
-                            console.WriteDealerInfo($"your total bet is now {newBet.Amount}€ and your total balance is not {player.Wallet.Balance}€");
+                            console.WriteDealerInfo($"your total bet is now {newBet.Amount}e and your total balance is not {player.Wallet.Balance}e");
 
                             playing = false;
                         }
@@ -165,7 +175,7 @@ namespace Blackjack_Sharp
 
             var option = string.Empty;
 
-            while (!console.TryAskLine($"{player.Name}, do you want to split? ({string.Join(",", QuestionOptions.Opts)})",
+            while (!console.TryAskLine($"{player.Name}, do you want to split? ({string.Join(", ", QuestionOptions.Opts)})",
                     out option,
                     s => QuestionOptions.Opts.Contains(s)))
             {
@@ -243,7 +253,7 @@ namespace Blackjack_Sharp
             var sb = new StringBuilder();
 
             sb.Append("my hand has the following cards ");
-            sb.Append(string.Join(",", hand.Select(s => s.ToString())));
+            sb.Append(string.Join(", ", hand.Select(s => s.ToString())));
             sb.Append($" with value {value} and soft value of {soft}");
 
             console.WritePlayerInfo(player.Name, sb.ToString());
@@ -284,7 +294,7 @@ namespace Blackjack_Sharp
                 // Keep asking the player for the bet until he gives us valid bet value...
                 var amount = 0u;
 
-                while (!console.TryAskUnsigned($"{player.Name}, please place your bet (1-{player.Wallet.Balance}€)",
+                while (!console.TryAskUnsigned($"{player.Name}, please place your bet (1-{player.Wallet.Balance}e)",
                                                out amount,
                                                n => n >= 1 && n <= player.Wallet.Balance))
                 {
@@ -311,7 +321,7 @@ namespace Blackjack_Sharp
             {
                 var option = string.Empty;
 
-                while (!console.TryAskLine($"{player.Name}, are you going to play? ({string.Join(",", QuestionOptions.Opts)})", 
+                while (!console.TryAskLine($"{player.Name}, are you going to play? ({string.Join(", ", QuestionOptions.Opts)})", 
                                            out option, 
                                            s => QuestionOptions.Opts.Contains(s)))
                 {
