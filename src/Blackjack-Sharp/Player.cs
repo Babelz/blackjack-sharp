@@ -26,13 +26,13 @@ namespace Blackjack_Sharp
         }
 
         /// <summary>
-        /// Gets the second hand of the player. This value will stay
+        /// Gets or sets the second hand of the player. This value will stay
         /// null until the primary hand is split.
         /// </summary>
         public Hand SecondaryHand
         {
             get;
-            private set;
+            set;
         }
 
         public Wallet Wallet

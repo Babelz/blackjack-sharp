@@ -26,9 +26,9 @@ namespace Blackjack_Sharp
         private readonly IBlackjackConsole console;
         private readonly IDealer dealer;
 
-        private readonly List<Player> playing;
-        private readonly List<Player> active;
-        private readonly List<Player> absent;
+        private readonly List<Player> playingPlayers;
+        private readonly List<Player> activePlayers;
+        private readonly List<Player> absentPlayers;
 
         private bool running;
         #endregion
@@ -38,9 +38,9 @@ namespace Blackjack_Sharp
             this.dealer  = dealer ?? throw new ArgumentNullException(nameof(dealer)); 
             this.console = console ?? throw new ArgumentNullException(nameof(console));
             
-            playing = new List<Player>();
-            active  = new List<Player>();
-            absent  = new List<Player>();
+            playingPlayers = new List<Player>();
+            activePlayers  = new List<Player>();
+            absentPlayers  = new List<Player>();
 
             bets = new Dictionary<Player, List<PlayerBet>>();
         }
@@ -57,7 +57,7 @@ namespace Blackjack_Sharp
             // Print player statuses.
             console.WriteLine("-- player statistics --");
 
-            foreach (var player in absent)
+            foreach (var player in absentPlayers)
             {
                 console.WriteLine($"{player}");
                 console.WriteLine($"balance: {player.Wallet.Balance}€\n");
@@ -81,24 +81,160 @@ namespace Blackjack_Sharp
             throw new NotImplementedException();
         }
 
-        private void PlayersPlay()
+        private void PlayerPlayHand(Player player, Hand hand, int handIndex, int handsCount)
         {
-            const string OptHit    = "hit";
-            const string OptStay   = "stay";
-            const string OptDouble = "double";
-            const string OptSplit  = "split";
+            var playing = true;
 
-            foreach (var player in playing)
+            while (playing)
             {
-                console.WritePlayerInfo(player.Name, "it's my turn");
+                var opts   = PlayerOptions.DetermineOps(player);
+                var option = string.Empty;
 
-                while (acting)
+                while (!console.TryAskLine($"playing your hand {handIndex + 1}/{handsCount}, what will you do? " +
+                                           $"({string.Join(",", opts)})",
+                                           out option,
+                                           s => opts.Contains(s)))
                 {
+                    console.WriteWarning("invalid operation!");
                 }
+
+                switch (option)
+                {
+                    case PlayerOptions.OptStay:
+                        console.WriteDealerInfo("staying, your turn is over");
+
+                        playing = false;
+                        break;
+                    case PlayerOptions.OptHit:
+                        console.WriteDealerInfo("dealing one card...");
+
+                        dealer.Deal(hand);
+
+                        RevealPlayerCards(player, hand);
+
+                        if (BlackjackRules.IsBlackjack(hand))
+                        {
+                            console.WriteDealerInfo("blackjack! your turn is over");
+
+                            playing = false;
+                        }
+                        else if (BlackjackRules.IsBusted(hand))
+                        {
+                            console.WriteDealerInfo("busted! sorry, your hand is out");
+
+                            playing = false;
+                        }
+                        break;
+                    case PlayerOptions.OptDouble:
+                        var bet = bets[player].First();
+
+                        if (player.Wallet.Balance < bet.Amount)
+                            console.WriteDealerInfo("sorry, you do not have enough balance to double");
+                        else
+                        {
+                            console.WriteDealerInfo("doubling your hand...");
+
+                            player.Wallet.Take(bet.Amount);
+
+                            var newBet = new PlayerBet(hand, bet.Amount * 2u);
+
+                            bets[player] = new List<PlayerBet>
+                            {
+                                newBet
+                            };
+
+                            console.WriteDealerInfo($"your total bet is now {newBet.Amount}€ and your total balance is not {player.Wallet.Balance}€");
+
+                            playing = false;
+                        }
+                        break;
+                    default:
+                        console.WriteWarning("sorry i could not understand you so i assume you are staying...");
+
+                        playing = false;
+                        break;
+                }
+
+                Delay();
             }
         }
 
-        private void RevealPlayerCards(Player player)
+        private void AskPlayerSplit(Player player, out bool aceSplit)
+        {
+            aceSplit = false;
+
+            var option = string.Empty;
+
+            while (!console.TryAskLine($"{player.Name}, do you want to split? ({string.Join(",", QuestionOptions.Opts)})",
+                    out option,
+                    s => QuestionOptions.Opts.Contains(s)))
+            {
+                console.WriteWarning("invalid answer");
+            }
+
+            switch (option)
+            {
+                case QuestionOptions.OptYes:
+                case QuestionOptions.OptYesShort:
+                    // Do not allow more plays after ace split.
+                    aceSplit = player.PrimaryHand.Count(c => c.Face == CardFace.Ace) == 2;
+
+                    console.WriteDealerInfo("splitting for you");
+
+                    // Split the primary hand.
+                    player.SecondaryHand = player.PrimaryHand.Split();
+
+                    // Deal one card to both cards.
+                    dealer.Deal(player.PrimaryHand);
+                    dealer.Deal(player.SecondaryHand);
+
+                    RevealPlayerCards(player, player.PrimaryHand);
+                    RevealPlayerCards(player, player.SecondaryHand);
+
+                    // Add secondary bet.
+                    bets[player].Add(new PlayerBet(player.SecondaryHand, bets[player].First().Amount));
+
+                    if (aceSplit)
+                        console.WriteDealerInfo("split two aces, your round ended");
+                    break;
+                default:
+                    break;
+            }
+
+            Delay();
+        }
+
+        private void PlayersPlay()
+        {
+            foreach (var player in playingPlayers)
+            {
+                console.WritePlayerInfo(player.Name, "it's my turn");
+
+                // Handle splitting for the player if he prefers to split.
+                var aceSplit = false;
+                
+                if (BlackjackRules.CanSplit(player.PrimaryHand) && player.Wallet.Balance >= bets[player].First().Amount)
+                    AskPlayerSplit(player, out aceSplit);
+
+                // Play the actual hands if not ace split.
+                if (aceSplit) continue;
+
+                // Determine hands.
+                var hands = new List<Hand>
+                {
+                    player.PrimaryHand
+                };
+
+                if (player.IsSplit)
+                    hands.Add(player.SecondaryHand);
+
+                // Play the actual hands.
+                for (var i = 0; i < hands.Count; i++)
+                    PlayerPlayHand(player, hands[i], i, hands.Count);
+            }
+        }
+
+        private void RevealPlayerCards(Player player, Hand hand)
         {
             // Compute hand value.
             BlackjackRules.ValueOf(player.PrimaryHand, out var value, out var soft);
@@ -107,21 +243,17 @@ namespace Blackjack_Sharp
             var sb = new StringBuilder();
 
             sb.Append("my hand has the following cards ");
-
-            sb.Append(player.PrimaryHand.First().ToString());
-            sb.Append(", ");
-            sb.Append(player.PrimaryHand.Last().ToString());
-
+            sb.Append(string.Join(",", hand.Select(s => s.ToString())));
             sb.Append($" with value {value} and soft value of {soft}");
 
             console.WritePlayerInfo(player.Name, sb.ToString());
         }
 
-        private void RevealPlayerCards()
+        private void RevealInitialPlayerCards()
         {
-            foreach (var player in playing)
+            foreach (var player in playingPlayers)
             {
-                RevealPlayerCards(player);
+                RevealPlayerCards(player, player.PrimaryHand);
 
                 Delay();
             }
@@ -139,7 +271,7 @@ namespace Blackjack_Sharp
                 // Begin by dealing to dealer.
                 dealer.DealSelf();
 
-                foreach (var player in playing)
+                foreach (var player in playingPlayers)
                     dealer.Deal(player.PrimaryHand);
             }
         }
@@ -147,12 +279,12 @@ namespace Blackjack_Sharp
         private void AskPlayerBets()
         {
             // Go trough all players, ask for initial bet before beginning the round.
-            foreach (var player in active)
+            foreach (var player in activePlayers)
             {
                 // Keep asking the player for the bet until he gives us valid bet value...
                 var amount = 0u;
 
-                while (!console.TryAskUnsigned($"{player.Name}, please place your bet between 1 and {player.Wallet.Balance} euros",
+                while (!console.TryAskUnsigned($"{player.Name}, please place your bet (1-{player.Wallet.Balance}€)",
                                                out amount,
                                                n => n >= 1 && n <= player.Wallet.Balance))
                 {
@@ -171,38 +303,32 @@ namespace Blackjack_Sharp
 
         private void StartRound()
         {
-            const string OptYes = "yes";
-            const string OptNo  = "no";
-
-            const string OptYesShort = "y";
-            const string OptNoShort  = "n";
-
             console.WriteSeparator();
 
             console.WriteDealerInfo("new round begins, place your bets");
 
-            foreach (var player in active)
+            foreach (var player in activePlayers)
             {
-                var value = string.Empty;
+                var option = string.Empty;
 
-                while (!console.TryAskLine($"{player.Name}, are you going to play? ({OptYes}, {OptNo})", 
-                                           out value, 
-                                           s => new [] { OptYes, OptNo, OptYesShort, OptNoShort }.Contains(s)))
+                while (!console.TryAskLine($"{player.Name}, are you going to play? ({string.Join(",", QuestionOptions.Opts)})", 
+                                           out option, 
+                                           s => QuestionOptions.Opts.Contains(s)))
                 {
                     console.WriteWarning("invalid answer");
                 }
 
-                switch (value)
+                switch (option)
                 {
-                    case OptYes:
-                    case OptYesShort:
+                    case QuestionOptions.OptYes:
+                    case QuestionOptions.OptYesShort:
                         // Make active for this round.
                         console.WriteDealerInfo($"welcome to the game {player.Name}");
 
-                        playing.Add(player);
+                        playingPlayers.Add(player);
                         break;
-                    case OptNo:
-                    case OptNoShort:
+                    case QuestionOptions.OptNo:
+                    case QuestionOptions.OptNoShort:
                         console.WriteDealerInfo($"well, maybe next round, your loss...");
                         break;
                     default:
@@ -232,7 +358,7 @@ namespace Blackjack_Sharp
             RevealDealersFirstCard();
 
             // Reveal cards of the players.
-            RevealPlayerCards();
+            RevealInitialPlayerCards();
 
             // Go trough players and allow them to play starting from first player.
             PlayersPlay();
@@ -247,7 +373,7 @@ namespace Blackjack_Sharp
             EndRound();
 
             // Exit game if no active players are left.
-            if (active.Count == 0)
+            if (activePlayers.Count == 0)
                 Exit();
         }
 
@@ -289,7 +415,7 @@ namespace Blackjack_Sharp
                 
                 var player = new Player(playerName, InitialBalance);
 
-                active.Add(player);
+                activePlayers.Add(player);
 
                 // Create lookup.
                 bets.Add(player, new List<PlayerBet>());

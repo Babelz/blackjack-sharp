@@ -25,7 +25,7 @@
 	- face cards are 10
 	- other cards are their values
 	- doubling allowed on all hands
-	- doubling allowed after split
+	- doubling NOT allowed after split
 	- after doubling you receive only one card
 	- splitting allowed once
 	- ace splits receive only ONE card
