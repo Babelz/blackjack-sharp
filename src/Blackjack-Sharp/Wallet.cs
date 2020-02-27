@@ -1,4 +1,6 @@
-﻿namespace Blackjack_Sharp
+﻿using System;
+
+namespace Blackjack_Sharp
 {
     /// <summary>
     /// Class that handles money related operations of players.
@@ -28,13 +30,12 @@
         public void Put(uint amount)
             => Balance += amount;
 
-        public bool TryTake(uint amount)
+        public void Take(uint amount)
         {
-            if (amount > Balance) return false;
+            if (amount > Balance) 
+                throw new ArgumentOutOfRangeException(nameof(amount), $"{nameof(amount)} > {nameof(Balance)}");
 
             Balance -= amount;
-
-            return true;
         }
     }
 }

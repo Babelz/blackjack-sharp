@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Linq;
+using System.Text;
 
 namespace Blackjack_Sharp
 {
@@ -78,7 +79,12 @@ namespace Blackjack_Sharp
             throw new NotImplementedException();
         }
 
-        private void PlayerPlay()
+        private void RevealDealersSecondCard()
+        {
+            throw new NotImplementedException();
+        }
+
+        private void PlayersPlay()
         {
             throw new NotImplementedException();
         }
@@ -86,15 +92,31 @@ namespace Blackjack_Sharp
         private void RevealPlayerCards()
         {
             foreach (var player in playing)
-                game.RevealCards()
+            {
+                // Compute hand value.
+                BlackjackRules.ValueOf(player.PrimaryHand, out var value, out var soft);
+                
+                // Construct string.
+                var sb = new StringBuilder();
+                
+                sb.Append("my hand has the following cards ");
+
+                sb.Append(player.PrimaryHand.First().ToString());
+                sb.Append(", ");
+                sb.Append(player.PrimaryHand.Last().ToString());
+
+                sb.Append($" with value {value} and soft value of {soft}");
+
+                console.WritePlayerInfo(player.Name, sb.ToString());
+
+                Delay();
+            }
         }
 
         private void RevealDealersFirstCard()
-        {
-            console.WriteDealerInfo($"first card is {dealer.Hand.}");
-        }
+            => console.WriteDealerInfo($"my first card is {dealer.Hand.First().ToString()}");
         
-        private void DealInitialCards()
+        private void DealCards()
         {
             const int InitialCards = 2;
 
@@ -108,7 +130,7 @@ namespace Blackjack_Sharp
             }
         }
 
-        private void PlaceBets()
+        private void AskPlayerBets()
         {
             // Go trough all players, ask for initial bet before beginning the round.
             foreach (var player in active)
@@ -117,28 +139,38 @@ namespace Blackjack_Sharp
                 var amount = 0u;
 
                 while (!console.TryAskUnsigned($"{player.Name}, please place your bet between 1 and {player.Wallet.Balance} euros",
-                                               out amount))
+                                               out amount,
+                                               n => n >= 1 && n <= player.Wallet.Balance))
                 {
                     console.WriteWarning("your bet is invalid!");
                 }
 
+                // Remove from wallet.
+                player.Wallet.Take(amount);
+
                 // Create bet and add to playing group.
                 bets[player].Add(new PlayerBet(player.PrimaryHand, amount));
 
-                playing.Add(player);
-
-                console.WriteDealerInfo("")
+                Delay();
             }
         }
 
-        private void AskIfPlaying()
+        private void StartRound()
         {
+            console.WriteSeparator();
+
+            console.WriteDealerInfo("new round begins, place your bets");
+
             foreach (var player in active)
             {
                 var value = string.Empty;
 
-                while (!console.TryAskLine("are you going to play? (yes, no)", out value))
+                while (!console.TryAskLine($"{player.Name}, are you going to play? (yes, no)", 
+                                           out value, 
+                                           s => new [] { "yes", "no", "y", "n" }.Contains(s)))
+                {
                     console.WriteWarning("invalid answer");
+                }
 
                 switch (value)
                 {
@@ -157,6 +189,8 @@ namespace Blackjack_Sharp
                         console.WriteWarning("sorry i could not understand you so i assume you are not playing...");
                         break;
                 }
+
+                Delay();
             }
         }
 
@@ -166,13 +200,13 @@ namespace Blackjack_Sharp
         public void RunOnce()
         {
             // Ask players if they are playing.
-            AskIfPlaying();
+            StartRound();
 
             // Start by placing bets.
-            PlaceBets();
+            AskPlayerBets();
 
             // Deal initial cards starting from the first player, deal to the dealer last.
-            DealInitialCards();
+            DealCards();
 
             // Reveal first card of the dealer.
             RevealDealersFirstCard();
@@ -181,7 +215,10 @@ namespace Blackjack_Sharp
             RevealPlayerCards();
 
             // Go trough players and allow them to play starting from first player.
-            PlayerPlay();
+            PlayersPlay();
+
+            // Reveal second dealer card.
+            RevealDealersSecondCard();
 
             // Allow dealer to play.
             DealerPlay();
@@ -199,14 +236,38 @@ namespace Blackjack_Sharp
         /// </summary>
         public void Initialize()
         {
+            // Print epic logo.             
+            console.WriteLine(@" _     _            _    _            _               _                      ");                      
+            console.WriteLine(@"| |   | |          | |  (_)          | |             | |                     ");
+            console.WriteLine(@"| |__ | | __ _  ___| | ___  __ _  ___| | ________ ___| |__   __ _ _ __ _ __  ");
+            console.WriteLine(@"| '_ \| |/ _` |/ __| |/ / |/ _` |/ __| |/ /______/ __| '_ \ / _` | '__| '_ \ ");
+            console.WriteLine(@"| |_) | | (_| | (__|   <| | (_| | (__|   <       \__ \ | | | (_| | |  | |_) |");
+            console.WriteLine(@"|_.__/|_|\__,_|\___|_|\_\ |\__,_|\___|_|\_\      |___/_| |_|\__,_|_|  | .__/ ");
+            console.WriteLine(@"                       _/ |                                           | |    ");
+            console.WriteLine(@"                      |__/                                            |_|    ");
+            console.WriteLine("\nby: babelz\n");
+            
+            console.WriteSeparator();
+
             // Initialize initial players.
-            var playersCount = game.AskPlayersCount();
+            var playersCount = 0u;
+
+            while (!console.TryAskUnsigned("number of players between 1 and 4", 
+                                           out playersCount, 
+                                           n => n >= 1 && n <= 4))
+            {
+                console.WriteWarning("expecting a number between 1 and 4!");
+            }
 
             for (var i = 0; i < playersCount; i++)
             {
                 // Create player.
-                var playerName = game.AskPlayerName(i + 1);
-                var player     = new Player(playerName, InitialBalance);
+                var playerName = string.Empty;
+
+                while (!console.TryAskLine($"name of the player at seat {i + 1}", out playerName))
+                    console.WriteWarning("expecting a name!");
+                
+                var player = new Player(playerName, InitialBalance);
 
                 active.Add(player);
 
@@ -224,7 +285,7 @@ namespace Blackjack_Sharp
         {
             Initialize();
 
-            while (!running) RunOnce();
+            while (running) RunOnce();
         }
     }
 }

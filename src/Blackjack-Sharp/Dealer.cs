@@ -32,6 +32,8 @@ namespace Blackjack_Sharp
         {
             this.additionalDecksCount = additionalDecksCount;
 
+            Hand = new Hand();
+
             PopulateDeck();
         }
 

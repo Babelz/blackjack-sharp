@@ -33,15 +33,23 @@ namespace Blackjack_Sharp
         /// Returns boolean declaring whether value represents a bust.
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool IsBusted(int value)
-            => value > 21;
+        public static bool IsBusted(IEnumerable<Card> cards)
+        {
+            ValueOf(cards, out var value, out var soft);
+
+            return value > 21 && soft > 21;
+        }
 
         /// <summary>
         /// Returns boolean declaring whether value represents a blackjack.
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool IsBlackjack(int value )
-            => value == 21;
+        public static bool IsBlackjack(IEnumerable<Card> cards)
+        {
+            ValueOf(cards, out var value, out var soft);
+
+            return value == 21 || soft == 21;
+        }
 
         /// <summary>
         /// Returns value and soft value of given card.
@@ -82,7 +90,7 @@ namespace Blackjack_Sharp
                 ValueOf(card, out var cardValue, out var cardSoft);
 
                 // In case an ace busts the current hand.
-                if (card.Face == CardFace.Ace && IsBusted(cardSoft + soft))
+                if (card.Face == CardFace.Ace && cardSoft + soft > 21)
                     cardSoft = 1;
 
                 value += cardValue;

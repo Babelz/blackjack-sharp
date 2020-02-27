@@ -41,60 +41,21 @@ namespace Blackjack_Sharp.Tests
         }
 
         [Fact()]
-        public void CanDoubleTest()
-        {
-            // 9, 10 and 11 should allow splitting.
-            Assert.True(BlackjackRules.CanDouble(new Card[]
-            {
-                new Card(CardFace.Six, CardSuit.Clubs),
-                new Card(CardFace.Three, CardSuit.Hearts)
-            }));
-
-            Assert.True(BlackjackRules.CanDouble(new Card[]
-            {
-                new Card(CardFace.Six, CardSuit.Clubs),
-                new Card(CardFace.Four, CardSuit.Hearts)
-            }));
-
-            Assert.True(BlackjackRules.CanDouble(new Card[]
-            {
-                new Card(CardFace.Six, CardSuit.Clubs),
-                new Card(CardFace.Five, CardSuit.Hearts)
-            }));
-
-            // 4 and 12 should not allow splitting.
-            Assert.False(BlackjackRules.CanDouble(new Card[]
-            {
-                new Card(CardFace.Two, CardSuit.Clubs),
-                new Card(CardFace.Two, CardSuit.Clubs)
-            }));
-
-            Assert.False(BlackjackRules.CanDouble(new Card[]
-            {
-                new Card(CardFace.Ten, CardSuit.Clubs),
-                new Card(CardFace.Two, CardSuit.Clubs)
-            }));
-        }
-
-        [Fact()]
         public void IsBustedTest()
         {
             // Values above 21 should be seen as bust.
-            Assert.True(BlackjackRules.IsBusted(22));
-            Assert.True(BlackjackRules.IsBusted(35));
 
             // Values equal or below 21 should not be seen as bust.
-            Assert.False(BlackjackRules.IsBusted(19));
-            Assert.False(BlackjackRules.IsBusted(21));
+            throw new NotImplementedException();
         }
 
         [Fact()]
         public void IsBlackjackTest()
         {
-            Assert.True(BlackjackRules.IsBlackjack(21));
-            
-            Assert.False(BlackjackRules.IsBlackjack(22));
-            Assert.False(BlackjackRules.IsBlackjack(20));
+            // 21 should be blackjack.
+
+            // Below 21 or above it should not be a blackjack.
+            throw new NotImplementedException();
         }
 
         [Fact()]

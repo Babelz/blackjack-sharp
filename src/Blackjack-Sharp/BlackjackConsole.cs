@@ -19,12 +19,8 @@ namespace Blackjack_Sharp
         }
 
         public void WriteLine(string line)
-        {
-            Console.Write("");
-
-            Console.WriteLine($"{line}");
-        }
-
+            => Console.WriteLine(line);
+        
         /// <summary>
         /// Writes given line as dealer info to the console.
         /// </summary>
@@ -34,7 +30,7 @@ namespace Blackjack_Sharp
 
             Console.ForegroundColor = dealerColor;
 
-            Console.WriteLine($"{line}");
+            Console.Write($"{line}{Environment.NewLine}");
 
             Console.ForegroundColor = ConsoleColor.White;
         }
@@ -48,7 +44,7 @@ namespace Blackjack_Sharp
 
             Console.ForegroundColor = playerColor;
 
-            Console.WriteLine($"{line}");
+            Console.Write($"{line}{Environment.NewLine}");
 
             Console.ForegroundColor = ConsoleColor.White;
         }
@@ -62,7 +58,7 @@ namespace Blackjack_Sharp
 
             Console.ForegroundColor = ConsoleColor.Yellow;
 
-            Console.WriteLine($"{line}");
+            Console.Write($"{line}{Environment.NewLine}");
 
             Console.ForegroundColor = ConsoleColor.White;
         }
@@ -77,35 +73,35 @@ namespace Blackjack_Sharp
         /// Attempts to ask a line from the player. Returns boolean declaring 
         /// whether line was entered.
         /// </summary>
-        public bool TryAskLine(string what, out string value)
+        public bool TryAskLine(string what, out string value, Func<string, bool> validation = null)
         {
             Console.Write($"{what}: ");
 
             value = Console.ReadLine();
 
-            return string.IsNullOrEmpty(value);
+            return !string.IsNullOrEmpty(value) && (validation?.Invoke(value) ?? true);
         }
 
         /// <summary>
         /// Attempts to ask a signed integer from the player. Returns boolean declaring 
         /// whether value was entered successfully.
         /// </summary>
-        public bool TryAskSigned(string what, out int value)
+        public bool TryAskSigned(string what, out int value, Func<int, bool> validation = null)
         {
             Console.Write($"{what}: ");
 
-            return int.TryParse(Console.ReadLine(), out value);
+            return int.TryParse(Console.ReadLine(), out value) && (validation?.Invoke(value) ?? true);
         }
 
         /// <summary>
         /// Attempts to ask a unsigned integer from the player. Returns boolean declaring 
         /// whether value was entered successfully
         /// </summary>
-        public bool TryAskUnsigned(string what, out uint value)
+        public bool TryAskUnsigned(string what, out uint value, Func<uint, bool> validation = null)
         {
             Console.Write($"{what}: ");
 
-            return uint.TryParse(Console.ReadLine(), out value);
+            return uint.TryParse(Console.ReadLine(), out value) && (validation?.Invoke(value) ?? true);
         }
     }
 }
