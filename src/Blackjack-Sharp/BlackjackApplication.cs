@@ -83,70 +83,45 @@ namespace Blackjack_Sharp
 
         private void PlayersPlay()
         {
+            const string OptHit    = "hit";
+            const string OptStay   = "stay";
+            const string OptDouble = "double";
+            const string OptSplit  = "split";
+
             foreach (var player in playing)
             {
                 console.WritePlayerInfo(player.Name, "it's my turn");
 
-                for (;;)
+                while (acting)
                 {
-                    var options = new List<string>()
-                    {
-                        PlayerCommand.Stay.ToString().ToLower(),
-                        PlayerCommand.Hit.ToString().ToLower(),
-                        PlayerCommand.Double.ToString().ToLower()
-                    };
-
-                    if (!player.IsSplit && BlackjackRules.CanSplit(player.PrimaryHand))
-                        options.Add(PlayerCommand.Split.ToString().ToLower());
-
-                    var optionsString = string.Join(',', options.SelectMany(s => s.ToString().ToLower()));
-                    var optionLine    = string.Empty;
-
-                    while (!console.TryAskLine($"what will you do ({optionsString})",
-                                               out optionLine, 
-                                               s => options.Contains(s)))
-                    {
-                        console.WriteWarning("invalid operation!");
-                    }
-
-                    var operation = (PlayerCommand)Enum.Parse(typeof(PlayerCommand), optionLine, true);
-
-                    switch (operation)
-                    {
-                        case PlayerCommand.Stay:
-                            break;
-                        case PlayerCommand.Hit:
-                            break;
-                        case PlayerCommand.Double:
-                            break;
-                        case PlayerCommand.Split:
-                            break;
-                        default:
-                            break;
-                    }
                 }
             }
+        }
+
+        private void RevealPlayerCards(Player player)
+        {
+            // Compute hand value.
+            BlackjackRules.ValueOf(player.PrimaryHand, out var value, out var soft);
+
+            // Construct string.
+            var sb = new StringBuilder();
+
+            sb.Append("my hand has the following cards ");
+
+            sb.Append(player.PrimaryHand.First().ToString());
+            sb.Append(", ");
+            sb.Append(player.PrimaryHand.Last().ToString());
+
+            sb.Append($" with value {value} and soft value of {soft}");
+
+            console.WritePlayerInfo(player.Name, sb.ToString());
         }
 
         private void RevealPlayerCards()
         {
             foreach (var player in playing)
             {
-                // Compute hand value.
-                BlackjackRules.ValueOf(player.PrimaryHand, out var value, out var soft);
-                
-                // Construct string.
-                var sb = new StringBuilder();
-                
-                sb.Append("my hand has the following cards ");
-
-                sb.Append(player.PrimaryHand.First().ToString());
-                sb.Append(", ");
-                sb.Append(player.PrimaryHand.Last().ToString());
-
-                sb.Append($" with value {value} and soft value of {soft}");
-
-                console.WritePlayerInfo(player.Name, sb.ToString());
+                RevealPlayerCards(player);
 
                 Delay();
             }
@@ -196,6 +171,12 @@ namespace Blackjack_Sharp
 
         private void StartRound()
         {
+            const string OptYes = "yes";
+            const string OptNo  = "no";
+
+            const string OptYesShort = "y";
+            const string OptNoShort  = "n";
+
             console.WriteSeparator();
 
             console.WriteDealerInfo("new round begins, place your bets");
@@ -204,24 +185,24 @@ namespace Blackjack_Sharp
             {
                 var value = string.Empty;
 
-                while (!console.TryAskLine($"{player.Name}, are you going to play? (yes, no)", 
+                while (!console.TryAskLine($"{player.Name}, are you going to play? ({OptYes}, {OptNo})", 
                                            out value, 
-                                           s => new [] { "yes", "no", "y", "n" }.Contains(s)))
+                                           s => new [] { OptYes, OptNo, OptYesShort, OptNoShort }.Contains(s)))
                 {
                     console.WriteWarning("invalid answer");
                 }
 
                 switch (value)
                 {
-                    case "y":
-                    case "yes":
+                    case OptYes:
+                    case OptYesShort:
                         // Make active for this round.
                         console.WriteDealerInfo($"welcome to the game {player.Name}");
 
                         playing.Add(player);
                         break;
-                    case "n":
-                    case "no":
+                    case OptNo:
+                    case OptNoShort:
                         console.WriteDealerInfo($"well, maybe next round, your loss...");
                         break;
                     default:
