@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
 
@@ -29,6 +30,10 @@ namespace Blackjack_Sharp
         public static bool CanSplit(IEnumerable<Card> cards)
             => cards.Count() == 2 && cards.ElementAt(0).Face == cards.ElementAt(1).Face;
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        internal static bool IsBusted(int value)
+            => value > 21;
+        
         /// <summary>
         /// Returns boolean declaring whether value represents a bust.
         /// </summary>
@@ -37,7 +42,7 @@ namespace Blackjack_Sharp
         {
             ValueOf(cards, out var value, out var soft);
 
-            return value > 21 && soft > 21;
+            return IsBusted(value) && IsBusted(soft);
         }
 
         /// <summary>

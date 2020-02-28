@@ -104,7 +104,7 @@ namespace Blackjack_Sharp
             {
                 var player = betPair.Key;
 
-                console.WriteDealerInfo($"{player.Name}, checking outcome of your hands...");
+                console.WriteDealerInfo($"checking outcome of your hands...");
 
                 for (var i = 0; i < betPair.Value.Count; i++)
                 {
@@ -121,12 +121,12 @@ namespace Blackjack_Sharp
                         $"your hand {i + 1}/{betPair.Value.Count} has cards {cards} " +
                         $"with value {playerValue}/{playerSoft}");
 
+                    
                     if (playerBust || dealerBlackjack)
                     {
                         // In case player busts or dealer hit's a blackjack, dealer
                         // always wins.
-                        console.WritePlayerInfo(
-                            player.Name, 
+                        console.WriteDealerInfo(
                             $"your hand {i + 1}/{betPair.Value.Count} lost total {bet.Amount}e");
                     }
                     else
@@ -153,7 +153,8 @@ namespace Blackjack_Sharp
                         }
                         else
                         {
-                            if (playerValue > dealerValue || playerSoft > dealerSoft)
+                            if ((playerValue > dealerValue && !BlackjackRules.IsBusted(playerValue)) || 
+                                (playerSoft > dealerSoft && !BlackjackRules.IsBusted(playerSoft)))
                             {
                                 // Player hand value greater than dealers.
                                 winAmount = bet.Amount * 2u;
@@ -176,6 +177,8 @@ namespace Blackjack_Sharp
 
                     clock.Delay(DelayTime);
                 }
+
+                console.WritePlayerInfo(player.Name, $"my balance now is {player.Wallet.Balance}e");
             }
 
             // Clear player and game states.
