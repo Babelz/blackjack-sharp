@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
-using System.Threading;
 using System.Linq;
 
 namespace Blackjack_Sharp
@@ -11,6 +10,13 @@ namespace Blackjack_Sharp
     /// </summary>
     public sealed class BlackjackApplication
     {
+        #region Static fields
+        /// <summary>
+        /// For how long the game can sleep when delay in the game is introduced.
+        /// </summary>
+        public static readonly TimeSpan DelayTime = TimeSpan.FromMilliseconds(750.0d); 
+        #endregion
+
         #region Constant fields
         /// <summary>
         /// Initial balance of all players in whole euros. 1000e
@@ -25,8 +31,15 @@ namespace Blackjack_Sharp
         private readonly IBlackjackConsole console;
         private readonly IDealer dealer;
 
+        private readonly IGameClock clock;
+
+        // List of players playing during a round.
         private readonly List<Player> playingPlayers;
+
+        // List of players that have non-zero balance.
         private readonly List<Player> activePlayers;
+
+        // List of players that have zero balance.
         private readonly List<Player> absentPlayers;
 
         private bool running;
@@ -43,10 +56,11 @@ namespace Blackjack_Sharp
             => absentPlayers;
         #endregion
 
-        public BlackjackApplication(IDealer dealer, IBlackjackConsole console)
+        public BlackjackApplication(IDealer dealer, IBlackjackConsole console, IGameClock clock)
         {
             this.dealer  = dealer ?? throw new ArgumentNullException(nameof(dealer)); 
             this.console = console ?? throw new ArgumentNullException(nameof(console));
+            this.clock   = clock ?? throw new ArgumentNullException(nameof(clock));
             
             playingPlayers = new List<Player>();
             activePlayers  = new List<Player>();
@@ -54,13 +68,6 @@ namespace Blackjack_Sharp
 
             bets = new Dictionary<Player, List<PlayerBet>>();
         }
-
-        /// <summary>
-        /// Introduces small delay during operations of game play.
-        /// </summary>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static void Delay()
-            => Thread.Sleep(TimeSpan.FromMilliseconds(750.0d));
 
         /// <summary>
         /// Gets card and value information of single hand.
@@ -167,7 +174,7 @@ namespace Blackjack_Sharp
                         player.Wallet.Put(winAmount);
                     }
 
-                    Delay();
+                    clock.Delay(DelayTime);
                 }
             }
 
@@ -222,7 +229,7 @@ namespace Blackjack_Sharp
 
                 playing = !(isBlackjack || isBust || shouldStay);
 
-                Delay();
+                clock.Delay(DelayTime);
             }
 
             console.WriteDealerInfo("my turn is over");
@@ -328,7 +335,7 @@ namespace Blackjack_Sharp
                         break;
                 }
 
-                Delay();
+                clock.Delay(DelayTime);
             }
         }
 
@@ -380,7 +387,7 @@ namespace Blackjack_Sharp
                     break;
             }
 
-            Delay();
+            clock.Delay(DelayTime);
         }
 
         private void PlayersPlay()
@@ -431,7 +438,7 @@ namespace Blackjack_Sharp
             {
                 RevealPlayerCards(player, player.PrimaryHand);
 
-                Delay();
+                clock.Delay(DelayTime);
             }
         }
 
@@ -474,7 +481,7 @@ namespace Blackjack_Sharp
                 // Create bet and add to playing group.
                 bets[player].Add(new PlayerBet(player.PrimaryHand, amount));
 
-                Delay();
+                clock.Delay(DelayTime);
             }
         }
 
@@ -514,7 +521,7 @@ namespace Blackjack_Sharp
                         break;
                 }
 
-                Delay();
+                clock.Delay(DelayTime);
             }
         }
 
@@ -525,6 +532,13 @@ namespace Blackjack_Sharp
         {
             // Ask players if they are playing.
             StartRound();
+
+            if (playingPlayers.Count == 0)
+            {
+                Exit();
+
+                return;
+            }
 
             // Start by placing bets.
             AskPlayerBets();

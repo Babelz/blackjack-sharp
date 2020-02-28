@@ -75,7 +75,7 @@ namespace Blackjack_Sharp.Tests
             // Below 21 or above it should not be a blackjack.
             Assert.False(BlackjackRules.IsBlackjack(new[]
             {
-                new Card(CardFace.Ten, CardSuit.Clubs),
+                new Card(CardFace.Nine, CardSuit.Clubs),
                 new Card(CardFace.Ace, CardSuit.Clubs),
             }));
 
@@ -84,8 +84,6 @@ namespace Blackjack_Sharp.Tests
                 new Card(CardFace.Ten, CardSuit.Clubs),
                 new Card(CardFace.Five, CardSuit.Clubs),
             }));
-
-            throw new NotImplementedException();
         }
 
         [Fact()]

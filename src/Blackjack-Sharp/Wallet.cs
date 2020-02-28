@@ -21,7 +21,7 @@ namespace Blackjack_Sharp
         /// Returns boolean declaring whether the wallet is empty.
         /// </summary>
         public bool Empty
-            => Balance == 0;
+            => Balance == 0u;
         #endregion
 
         public Wallet(uint initialBalance)

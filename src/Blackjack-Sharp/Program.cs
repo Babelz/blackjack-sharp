@@ -8,7 +8,8 @@ namespace Blackjack_Sharp
         {
             var application = new BlackjackApplication(
                 new Dealer(5), 
-                new BlackjackConsole(ConsoleColor.Green, ConsoleColor.Cyan));
+                new BlackjackConsole(ConsoleColor.Green, ConsoleColor.Cyan),
+                new GameClock());
 
             application.Run();
         }
