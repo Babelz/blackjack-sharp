@@ -66,14 +66,7 @@ namespace Blackjack_Sharp
 
         private void Exit()
         {
-            // Print player statuses.
-            console.WriteLine("-- player statistics --");
-
-            foreach (var player in absentPlayers)
-            {
-                console.WriteLine($"{player.Name}");
-                console.WriteLine($"balance: {player.Wallet.Balance}e\n");
-            }
+            console.WriteDealerInfo("no active players in the table, game finished");
 
             running = false;
         }
@@ -88,6 +81,7 @@ namespace Blackjack_Sharp
                                    out var dealerValue,
                                    out var dealerSoft);
 
+            // Check all bets.
             foreach (var betPair in bets)
             {
                 var player = betPair.Key;
@@ -99,6 +93,7 @@ namespace Blackjack_Sharp
                     var bet           = betPair.Value[i];
                     var didPlayerBust = BlackjackRules.IsBusted(bet.Hand);
 
+                    // Write hand before handling.
                     GetHandInfo(bet.Hand, 
                                 out var cards, 
                                 out var playerValue, 
@@ -110,6 +105,8 @@ namespace Blackjack_Sharp
 
                     if (didPlayerBust || didDealerHitBlackjack)
                     {
+                        // In case player busts or dealer hit's a blackjack, dealer
+                        // always wins.
                         console.WritePlayerInfo(
                             player.Name, 
                             $"your hand {i + 1}/{betPair.Value.Count} lost total {bet.Amount}e");
@@ -120,6 +117,7 @@ namespace Blackjack_Sharp
 
                         if (BlackjackRules.IsBlackjack(bet.Hand))
                         {
+                            // Player hit a blackjack.
                             winAmount = bet.Amount * 2u;
 
                             console.WritePlayerInfo(
@@ -128,6 +126,7 @@ namespace Blackjack_Sharp
                         }
                         else if (!didPlayerBust && didDealerBust)
                         {
+                            // Dealer bust.
                             winAmount = bet.Amount * 2u;
                             
                             console.WritePlayerInfo(
@@ -138,6 +137,7 @@ namespace Blackjack_Sharp
                         {
                             if (playerValue > dealerValue || playerSoft > dealerSoft)
                             {
+                                // Player hand value greater than dealers.
                                 winAmount = bet.Amount * 2u;
 
                                 console.WritePlayerInfo(
@@ -146,6 +146,7 @@ namespace Blackjack_Sharp
                             }
                             else
                             {
+                                // Dealers hand value greater than players.
                                 console.WritePlayerInfo(
                                     player.Name, 
                                     $"your hand {i + 1}/{betPair.Value.Count} lost total {bet.Amount}e");
@@ -168,7 +169,8 @@ namespace Blackjack_Sharp
 
                 if (player.Wallet.Empty)
                 {
-                    console.WriteDealerInfo($"{player.Name} you are out! come back when you have some money to play!");
+                    console.WriteDealerInfo($"{player.Name} you are out! " +
+                                            "come back when you have some money to play!");
 
                     activePlayers.Remove(player);
                     absentPlayers.Add(player);
@@ -300,7 +302,8 @@ namespace Blackjack_Sharp
                                 newBet
                             };
 
-                            console.WriteDealerInfo($"your total bet is now {newBet.Amount}e and your total balance is now {player.Wallet.Balance}e");
+                            console.WriteDealerInfo($"your total bet is now {newBet.Amount}e " +
+                                                    $"and your total balance is now {player.Wallet.Balance}e");
 
                             RevealPlayerCards(player, hand);
 
@@ -324,7 +327,8 @@ namespace Blackjack_Sharp
 
             var option = string.Empty;
 
-            while (!console.TryAskLine($"{player.Name}, do you want to split? ({string.Join(", ", QuestionOptions.Opts)})",
+            while (!console.TryAskLine($"{player.Name}, do you want to split? " +
+                                       $"({string.Join(", ", QuestionOptions.Opts)})",
                     out option,
                     s => QuestionOptions.Opts.Contains(s)))
             {
@@ -377,7 +381,8 @@ namespace Blackjack_Sharp
                 // Handle splitting for the player if he prefers to split.
                 var aceSplit = false;
                 
-                if (BlackjackRules.CanSplit(player.PrimaryHand) && player.Wallet.Balance >= bets[player].First().Amount)
+                if (BlackjackRules.CanSplit(player.PrimaryHand) && 
+                    player.Wallet.Balance >= bets[player].First().Amount)
                     AskPlayerSplit(player, out aceSplit);
 
                 // Play the actual hands if not ace split.
@@ -444,7 +449,8 @@ namespace Blackjack_Sharp
                 // Keep asking the player for the bet until he gives us valid bet value...
                 var amount = 0u;
 
-                while (!console.TryAskUnsigned($"{player.Name}, please place your bet (1-{player.Wallet.Balance}e)",
+                while (!console.TryAskUnsigned($"{player.Name}, please place your bet " +
+                                               $"(1-{player.Wallet.Balance}e)",
                                                out amount,
                                                n => n >= 1 && n <= player.Wallet.Balance))
                 {
@@ -471,7 +477,8 @@ namespace Blackjack_Sharp
             {
                 var option = string.Empty;
 
-                while (!console.TryAskLine($"{player.Name}, are you going to play? ({string.Join(", ", QuestionOptions.Opts)})", 
+                while (!console.TryAskLine($"{player.Name}, are you going to play? " +
+                                           $"({string.Join(", ", QuestionOptions.Opts)})", 
                                            out option, 
                                            s => QuestionOptions.Opts.Contains(s)))
                 {
