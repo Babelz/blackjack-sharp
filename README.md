@@ -3,7 +3,7 @@ blackjack-sharp
 
 CLI blackjack implemented in C#
 
-##Dependencies:
+## Dependencies:
 * .NET core 3.1 
 * https://dotnet.microsoft.com/download/dotnet-core/3.1
 
