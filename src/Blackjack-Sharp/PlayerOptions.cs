@@ -1,6 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
+using System.Linq;
 
 namespace Blackjack_Sharp
 {
@@ -19,7 +18,7 @@ namespace Blackjack_Sharp
         /// Return enumerable containing possible options for player
         /// based on hes state.
         /// </summary>
-        public static IEnumerable<string> DetermineOps(Player player)
+        public static IEnumerable<string> DetermineOps(Player player, Hand hand)
         {
             var opts = new List<string>()
             {
@@ -28,7 +27,7 @@ namespace Blackjack_Sharp
             };
 
             // Do not allow doubling after split.
-            if (!player.IsSplit)
+            if (!player.IsSplit && hand.Count() == 2)
                 opts.Add(OptDouble);
 
             return opts;

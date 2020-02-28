@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Linq;
-using System.Text;
 
 namespace Blackjack_Sharp
 {
@@ -50,8 +49,21 @@ namespace Blackjack_Sharp
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static void Delay()
-            => Thread.Sleep(TimeSpan.FromMilliseconds(250.0d));
-        
+            => Thread.Sleep(TimeSpan.FromMilliseconds(750.0d));
+
+        /// <summary>
+        /// Gets card and value information of single hand.
+        /// </summary>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static void GetHandInfo(Hand hand, out string cards, out int value, out int soft)
+        {
+            // Compute hand values.
+            BlackjackRules.ValueOf(hand, out value, out soft);
+
+            // Make string representing the whole hand.
+            cards = string.Join(", ", hand.Select(s => s.ToString()));
+        }
+
         private void Exit()
         {
             // Print player statuses.
@@ -59,7 +71,7 @@ namespace Blackjack_Sharp
 
             foreach (var player in absentPlayers)
             {
-                console.WriteLine($"{player}");
+                console.WriteLine($"{player.Name}");
                 console.WriteLine($"balance: {player.Wallet.Balance}e\n");
             }
 
@@ -68,26 +80,157 @@ namespace Blackjack_Sharp
 
         private void EndRound()
         {
-            throw new NotImplementedException();
+            // Determine the outcome of player bets.
+            var didDealerHitBlackjack = BlackjackRules.IsBlackjack(dealer.Hand);
+            var didDealerBust         = BlackjackRules.IsBusted(dealer.Hand);
+
+            BlackjackRules.ValueOf(dealer.Hand,
+                                   out var dealerValue,
+                                   out var dealerSoft);
+
+            foreach (var betPair in bets)
+            {
+                var player = betPair.Key;
+
+                console.WriteDealerInfo($"{player.Name}, checking outcome of your hands...");
+
+                for (var i = 0; i < betPair.Value.Count; i++)
+                {
+                    var bet           = betPair.Value[i];
+                    var didPlayerBust = BlackjackRules.IsBusted(bet.Hand);
+
+                    GetHandInfo(bet.Hand, 
+                                out var cards, 
+                                out var playerValue, 
+                                out var playerSoft);
+
+                    console.WriteDealerInfo(
+                        $"your hand {i + 1}/{betPair.Value.Count} has cards {cards} " +
+                        $"with value {playerValue}/{playerSoft}");
+
+                    if (didPlayerBust || didDealerHitBlackjack)
+                    {
+                        console.WritePlayerInfo(
+                            player.Name, 
+                            $"your hand {i + 1}/{betPair.Value.Count} lost total {bet.Amount}e");
+                    }
+                    else
+                    {
+                        var winAmount = 0u;
+
+                        if (BlackjackRules.IsBlackjack(bet.Hand))
+                        {
+                            winAmount = bet.Amount * 2u;
+
+                            console.WritePlayerInfo(
+                                player.Name,
+                                $"hand {i + 1}/{betPair.Value.Count} blackjack wins {winAmount}e");
+                        }
+                        else if (!didPlayerBust && didDealerBust)
+                        {
+                            winAmount = bet.Amount * 2u;
+                            
+                            console.WritePlayerInfo(
+                                player.Name,
+                                $"hand {i + 1}/{betPair.Value.Count} wins {winAmount}e, dealer bust");
+                        }
+                        else
+                        {
+                            if (playerValue > dealerValue || playerSoft > dealerSoft)
+                            {
+                                winAmount = bet.Amount * 2u;
+
+                                console.WritePlayerInfo(
+                                    player.Name,
+                                    $"hand {i + 1}/{betPair.Value.Count} wins {winAmount}e");
+                            }
+                            else
+                            {
+                                console.WritePlayerInfo(
+                                    player.Name, 
+                                    $"your hand {i + 1}/{betPair.Value.Count} lost total {bet.Amount}e");
+                            }
+                        }
+
+                        player.Wallet.Put(winAmount);
+                    }
+
+                    Delay();
+                }
+            }
+
+            // Clear player and game states.
+            foreach (var player in playingPlayers)
+            {
+                bets[player].Clear();
+
+                player.Clear();
+
+                if (player.Wallet.Empty)
+                {
+                    console.WriteDealerInfo($"{player.Name} you are out! come back when you have some money to play!");
+
+                    activePlayers.Remove(player);
+                    absentPlayers.Add(player);
+                }
+            }
+            
+            playingPlayers.Clear();
+
+            // Clear dealer state.
+            dealer.Hand.Clear();
         }
 
         private void DealerPlay()
         {
-            throw new NotImplementedException();
-        }
-
-        private void RevealDealersSecondCard()
-        {
-            console.WriteDealerInfo($"my first card is {dealer.Hand.First().ToString()}");
-        }
-
-        private void PlayerPlayHand(Player player, Hand hand, int handIndex, int handsCount)
-        {
+            // Flag to keep track of blackjack, bust or preferred value.
             var playing = true;
 
             while (playing)
             {
-                var opts   = PlayerOptions.DetermineOps(player);
+                // Get possible out comes.
+                var isBlackjack = BlackjackRules.IsBlackjack(dealer.Hand);
+                var isBust      = BlackjackRules.IsBusted(dealer.Hand);
+                var shouldStay  = BlackjackRules.ShouldStay(dealer.Hand);
+
+                // Act according to outcome.
+                if      (isBlackjack) console.WriteDealerInfo("blackjack!");
+                else if (isBust)      console.WriteDealerInfo("bust!");
+                else if (shouldStay)  console.WriteDealerInfo("staying at my current hand");
+                else
+                {
+                    // Deal self one card and reveal new hand.
+                    console.WriteDealerInfo("dealing myself one");
+
+                    dealer.DealSelf();
+
+                    RevealDealerHand();
+                }
+
+                playing = !(isBlackjack || isBust || shouldStay);
+
+                Delay();
+            }
+
+            console.WriteDealerInfo("my turn is over");
+        }
+
+        private void RevealDealerHand()
+        {
+            // Begin revealing the full hand of dealer.
+            GetHandInfo(dealer.Hand, out var cards, out var value, out var soft);
+
+            console.WriteDealerInfo($"my hand has cards {cards} and value {value}/{soft}");
+        }
+
+        private void PlayerPlayHand(Player player, Hand hand, int handIndex, int handsCount)
+        {
+            // Flag to keep track of blackjacks, busts and stays.
+            var playing = true;
+
+            while (playing)
+            {
+                var opts   = PlayerOptions.DetermineOps(player, hand);
                 var option = string.Empty;
 
                 while (!console.TryAskLine($"playing your hand {handIndex + 1}/{handsCount}, what will you do? " +
@@ -140,6 +283,10 @@ namespace Blackjack_Sharp
                             // Do the actual doubling.
                             console.WriteDealerInfo("doubling your hand...");
 
+                            // Deal single card as of doubling.
+                            dealer.Deal(hand);
+
+                            // Take double amount from wallet.
                             player.Wallet.Take(bet.Amount);
 
                             // Create new bet in place of the current one, we can 
@@ -153,7 +300,9 @@ namespace Blackjack_Sharp
                                 newBet
                             };
 
-                            console.WriteDealerInfo($"your total bet is now {newBet.Amount}e and your total balance is not {player.Wallet.Balance}e");
+                            console.WriteDealerInfo($"your total bet is now {newBet.Amount}e and your total balance is now {player.Wallet.Balance}e");
+
+                            RevealPlayerCards(player, hand);
 
                             playing = false;
                         }
@@ -202,7 +351,12 @@ namespace Blackjack_Sharp
                     RevealPlayerCards(player, player.SecondaryHand);
 
                     // Add secondary bet.
-                    bets[player].Add(new PlayerBet(player.SecondaryHand, bets[player].First().Amount));
+                    var bet = bets[player].First();
+
+                    bets[player].Add(new PlayerBet(player.SecondaryHand, bet.Amount));
+
+                    // Update wallet.
+                    player.Wallet.Take(bet.Amount);
 
                     if (aceSplit)
                         console.WriteDealerInfo("split two aces, your round ended");
@@ -246,17 +400,13 @@ namespace Blackjack_Sharp
 
         private void RevealPlayerCards(Player player, Hand hand)
         {
-            // Compute hand value.
-            BlackjackRules.ValueOf(player.PrimaryHand, out var value, out var soft);
+            // Get hand information for display.
+            GetHandInfo(hand, out var cards, out var value, out var soft);
 
-            // Construct string.
-            var sb = new StringBuilder();
-
-            sb.Append("my hand has the following cards ");
-            sb.Append(string.Join(", ", hand.Select(s => s.ToString())));
-            sb.Append($" with value {value} and soft value of {soft}");
-
-            console.WritePlayerInfo(player.Name, sb.ToString());
+            // Reveal the hand.
+            console.WritePlayerInfo(
+                player.Name,
+                $"my hand has the following cards {cards} with value {value}/{soft}");
         }
 
         private void RevealInitialPlayerCards()
@@ -374,7 +524,7 @@ namespace Blackjack_Sharp
             PlayersPlay();
 
             // Reveal second dealer card.
-            RevealDealersSecondCard();
+            RevealDealerHand();
 
             // Allow dealer to play.
             DealerPlay();
