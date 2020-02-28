@@ -33,14 +33,14 @@ namespace Blackjack_Sharp
         #endregion
 
         #region Properties        
-        public IEnumerable<Player> PlayingPlayers => 
-            playingPlayers;
+        public IEnumerable<Player> PlayingPlayers
+            => playingPlayers;
         
-        public IEnumerable<Player> ActivePlayers => 
-            activePlayers;
+        public IEnumerable<Player> ActivePlayers 
+            => activePlayers;
         
-        public IEnumerable<Player> AbsentPlayers => 
-            absentPlayers;
+        public IEnumerable<Player> AbsentPlayers 
+            => absentPlayers;
         #endregion
 
         public BlackjackApplication(IDealer dealer, IBlackjackConsole console)
@@ -85,8 +85,8 @@ namespace Blackjack_Sharp
         private void EndRound()
         {
             // Determine the outcome of player bets.
-            var didDealerHitBlackjack = BlackjackRules.IsBlackjack(dealer.Hand);
-            var didDealerBust         = BlackjackRules.IsBusted(dealer.Hand);
+            var dealerBlackjack = BlackjackRules.IsBlackjack(dealer.Hand);
+            var dealerBust      = BlackjackRules.IsBusted(dealer.Hand);
 
             BlackjackRules.ValueOf(dealer.Hand,
                                    out var dealerValue,
@@ -101,8 +101,8 @@ namespace Blackjack_Sharp
 
                 for (var i = 0; i < betPair.Value.Count; i++)
                 {
-                    var bet           = betPair.Value[i];
-                    var didPlayerBust = BlackjackRules.IsBusted(bet.Hand);
+                    var bet        = betPair.Value[i];
+                    var playerBust = BlackjackRules.IsBusted(bet.Hand);
 
                     // Write hand before handling.
                     GetHandInfo(bet.Hand, 
@@ -114,7 +114,7 @@ namespace Blackjack_Sharp
                         $"your hand {i + 1}/{betPair.Value.Count} has cards {cards} " +
                         $"with value {playerValue}/{playerSoft}");
 
-                    if (didPlayerBust || didDealerHitBlackjack)
+                    if (playerBust || dealerBlackjack)
                     {
                         // In case player busts or dealer hit's a blackjack, dealer
                         // always wins.
@@ -135,7 +135,7 @@ namespace Blackjack_Sharp
                                 player.Name,
                                 $"hand {i + 1}/{betPair.Value.Count} blackjack wins {winAmount}e");
                         }
-                        else if (!didPlayerBust && didDealerBust)
+                        else if (!playerBust && dealerBust)
                         {
                             // Dealer bust.
                             winAmount = bet.Amount * 2u;
