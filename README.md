@@ -1,6 +1,8 @@
 # blackjack-sharp
 CLI blackjack implemented in C#
 
+Requires .NET core 3.1
+
 To build:
 * cd src
 * dotnet restore
