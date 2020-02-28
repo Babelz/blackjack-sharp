@@ -1,6 +1,5 @@
 ﻿using Xunit;
 using System;
-using System.Text;
 
 namespace Blackjack_Sharp.Tests
 {
@@ -42,17 +41,50 @@ namespace Blackjack_Sharp.Tests
         public void IsBustedTest()
         {
             // Values above 21 should be seen as bust.
+            Assert.True(BlackjackRules.IsBusted(new[]
+            {
+                new Card(CardFace.Ten, CardSuit.Clubs),
+                new Card(CardFace.Ten, CardSuit.Clubs),
+                new Card(CardFace.Ten, CardSuit.Clubs)
+            }));
 
             // Values equal or below 21 should not be seen as bust.
-            throw new NotImplementedException();
+            Assert.False(BlackjackRules.IsBusted(new[]
+            {
+                new Card(CardFace.Ten, CardSuit.Clubs),
+                new Card(CardFace.Ace, CardSuit.Clubs),
+            }));
+
+            Assert.False(BlackjackRules.IsBusted(new[]
+            {
+                new Card(CardFace.Ten, CardSuit.Clubs),
+                new Card(CardFace.Five, CardSuit.Clubs),
+            }));
         }
 
         [Fact()]
         public void IsBlackjackTest()
         {
             // 21 should be blackjack.
+            Assert.True(BlackjackRules.IsBlackjack(new[]
+            {
+                new Card(CardFace.Ten, CardSuit.Clubs),
+                new Card(CardFace.Ace, CardSuit.Clubs),
+            }));
 
             // Below 21 or above it should not be a blackjack.
+            Assert.False(BlackjackRules.IsBlackjack(new[]
+            {
+                new Card(CardFace.Ten, CardSuit.Clubs),
+                new Card(CardFace.Ace, CardSuit.Clubs),
+            }));
+
+            Assert.False(BlackjackRules.IsBlackjack(new[]
+            {
+                new Card(CardFace.Ten, CardSuit.Clubs),
+                new Card(CardFace.Five, CardSuit.Clubs),
+            }));
+
             throw new NotImplementedException();
         }
 

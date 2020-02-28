@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Blackjack_Sharp
+﻿namespace Blackjack_Sharp
 {
     /// <summary>
     /// Default implementation of <see cref="IDealer"/>.

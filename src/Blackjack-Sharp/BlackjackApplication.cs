@@ -32,6 +32,17 @@ namespace Blackjack_Sharp
         private bool running;
         #endregion
 
+        #region Properties        
+        public IEnumerable<Player> PlayingPlayers => 
+            playingPlayers;
+        
+        public IEnumerable<Player> ActivePlayers => 
+            activePlayers;
+        
+        public IEnumerable<Player> AbsentPlayers => 
+            absentPlayers;
+        #endregion
+
         public BlackjackApplication(IDealer dealer, IBlackjackConsole console)
         {
             this.dealer  = dealer ?? throw new ArgumentNullException(nameof(dealer)); 
