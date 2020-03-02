@@ -1,6 +1,6 @@
 -- rules --
 	- dealer always has 6 decks, 52 cards each
-     - new deck is put in to play once one is empty
+        - new deck is put in to play once one is empty
 	- ace is 1 or 11
 	- face cards are 10
 	- other cards are their values
