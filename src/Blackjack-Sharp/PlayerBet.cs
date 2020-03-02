@@ -3,7 +3,7 @@
 namespace Blackjack_Sharp
 {
     /// <summary>
-    /// Class that represents bet information single hand.
+    /// Class that represents bet information of single hand.
     /// </summary>
     public sealed class PlayerBet
     {
